@@ -1,0 +1,48 @@
+#include <vector>
+#include <algorithm>
+#include <climits>
+using namespace std;
+
+class Solution {
+public:
+    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+        int m = nums1.size(); // Size of the first array
+        int n = nums2.size(); // Size of the second array
+
+        // Ensure nums1 is the smaller array to reduce binary search range
+        if (m > n) return findMedianSortedArrays(nums2, nums1);
+
+        int s = 0;  // Start of binary search range
+        int e = m;  // End of binary search range
+
+        while (s <= e) {
+            int mid1 = (s + e) / 2;                // Partition index for nums1
+            int mid2 = (m + n + 1) / 2 - mid1;    // Partition index for nums2
+
+            // Determine the left and right elements around the partition in nums1
+            int leftval1 = (mid1 == 0) ? INT_MIN : nums1[mid1 - 1];
+            int rightval1 = (mid1 == m) ? INT_MAX : nums1[mid1];
+
+            // Determine the left and right elements around the partition in nums2
+            int leftval2 = (mid2 == 0) ? INT_MIN : nums2[mid2 - 1];
+            int rightval2 = (mid2 == n) ? INT_MAX : nums2[mid2];
+
+            // Check if the partitions are valid
+            if (leftval1 > rightval2) {
+                e = mid1 - 1; // Move the search range left
+            } else if (leftval2 > rightval1) {
+                s = mid1 + 1; // Move the search range right
+            } else {
+                // Correct partition found
+                if ((m + n) % 2 == 0) {
+                    // If total size is even, median is the average of max(left side) and min(right side)
+                    return (max(leftval1, leftval2) + min(rightval1, rightval2)) / 2.0;
+                }
+                // If total size is odd, median is max(left side)
+                return max(leftval1, leftval2);
+            }
+        }
+
+        return -1; // Should never reach here for valid input
+    }
+};
